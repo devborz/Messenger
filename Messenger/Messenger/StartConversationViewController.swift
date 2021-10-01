@@ -95,7 +95,7 @@ class StartConversationViewModel {
     var presentingUsers: PredefinedObservable<[UserCellViewModel]> = PredefinedObservable([])
     
     init() {
-        DBManager.shared.getUsers { [weak self] users
+        DatabaseManager.shared.getUsers { [weak self] users
             var viewModels: [UserCellViewModel] = []
             for user in users {
                 if user.id != DBManager.shared.currentUserID {

@@ -43,7 +43,7 @@ final class ChatsService {
         didFirstLoad = false
         nodes.removeAll()
         deletedNodes.removeAll()
-        if DatabaseManager.shared.isLoggedIn() {
+        if DatabaseManager.shared.isLoggedIn {
             ChatsManager.shared.getAllChats { [weak self] chats in
                 var nodes: [ChatNode] = []
                 for chat in chats {
