@@ -43,7 +43,7 @@ final class StorageManager {
     }
     
     func setCurrentUserAvatar(_ avatar: UIImage, completion: @escaping (AvatarURL) -> Void) {
-        guard let id = AuthManager.shared.currentUserID() else { return }
+        guard let id = DatabaseManager.shared.currentUserID else { return }
         let storageRef = Storage.storage().reference()
         let avatarRef = storageRef.child("avatars/\(id)/avatar.jpg")
         let c_avatarRef = storageRef.child("avatars/\(id)/avatar_compressed.jpg")

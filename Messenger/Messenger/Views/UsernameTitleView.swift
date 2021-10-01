@@ -56,11 +56,6 @@ final class UsernameTitleView: UIView {
         viewModel.username.bind { [weak self] value in
             self?.usernameLabel.text = value
         }
-        viewModel.isVerified.bind { [weak self] value in
-            guard let value = value else { return }
-            self?.verifiedImageView.image = value ? UIImage(systemName: "checkmark.seal.fill") : nil
-            self?.imageViewConstraint.constant = value ? 16 : 0
-        }
     }
     
     required init?(coder: NSCoder) {
@@ -79,13 +74,10 @@ class UsernameTitleViewModel {
 
     var username: Observable<String> = Observable()
     
-    var isVerified: Observable<Bool> = Observable()
-    
     init(_ userID: String) {
         self.userID = userID
-        DatabaseManager.shared.listenUser(userID) { user in
+        DatabaseManager.shared.getUser(userID) { user in
             self.username.value = user.username
-            self.isVerified.value = user.isVerified
         }
     }
     

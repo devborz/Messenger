@@ -31,16 +31,3 @@ class UserCellViewModel {
         }
     }
 }
-
-class UserFollowCellViewModel: UserCellViewModel {
-    
-    var isFollowing: Observable<Bool> = Observable()
-    
-    override init(with model: User) {
-        super.init(with: model)
-        DBManager.shared.isCurrentUserFollowingUserWith(model.id) { [weak self] value in
-            self?.isFollowing.value = value
-        }
-    }
-    
-}

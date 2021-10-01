@@ -34,7 +34,6 @@ class UserCell: UITableViewCell {
     func setup(_ viewModel: UserCellViewModel) {
         self.viewModel = viewModel
         usernameLabel.text = viewModel.username
-        verifiedImageView.image = viewModel.isVerified ? UIImage(systemName: "checkmark.seal.fill") : nil
         viewModel.avatar.bind { [weak self] image in
             DispatchQueue.main.async {
                 self?.avatarImageView.image = image

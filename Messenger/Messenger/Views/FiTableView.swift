@@ -67,10 +67,11 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
     }
     
     func reload(snapshot: FiSnapshot) {
-        self.snapshot = snapshot
-        DispatchQueue.main.async { [weak self] in
-            self?.reloadData()
-        }
+        
+        self.snapshot = []
+//        DispatchQueue.main.async { [weak self] in
+//            self?.reloadData()
+//        }
     }
     
     func animateDifference(snapshot: FiSnapshot) {

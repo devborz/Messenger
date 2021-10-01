@@ -96,15 +96,15 @@ final class MessageViewModel: Hashable {
         case .location(location: let location):
             messageLocation = location
         case .image(url: let url):
-//            ImageLoader.shared.downloadImageFromURL(url) { [weak self] image in
-//                self?.messagePhoto.value = image
-//            }
+            ImageLoader.shared.downloadImageFromURL(url) { [weak self] image in
+                self?.messagePhoto.value = image
+            }
             break
         }
         if let url = sender.c_avatarURL {
-//            ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] image in
-//                self?.senderAvatar.value = image
-//            }
+            ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] image in
+                self?.senderAvatar.value = image
+            }
         } else {
             self.senderAvatar.value = UIImage(systemName: "person.crop.circle")
         }

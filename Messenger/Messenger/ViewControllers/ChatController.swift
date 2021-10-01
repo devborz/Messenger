@@ -115,13 +115,6 @@ final class ChatController: UIViewController {
                     cell.selectionStyle = .none
                     cell.delegate = self
                     return cell
-                case .event:
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "event", for: indexPath) as! EventMessageCell
-                    cell.setup(viewModel)
-                    cell.transform = CGAffineTransform(rotationAngle: .pi)
-                    cell.selectionStyle = .none
-                    cell.delegate = self
-                    return cell
                 default:
                     let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath) as! TextMessageCell
                     cell.setup(viewModel)

@@ -25,11 +25,26 @@ class DatabaseManager {
     var ref = Firestore.firestore()
     
     private init() {
-        getCurrentUser { user in
-            self.currentUser = user
+        DatabaseManager.shared.prepareData {
+//                NotificationsService.shared.prepareData()
+            ChatsService.shared.prepareData()
+        }
+        Auth.auth().addStateDidChangeListener { auth, user in
+            ChatsManager.shared.removeActiveListeners()
+            DatabaseManager.shared.prepareData {
+//                NotificationsService.shared.prepareData()
+                ChatsService.shared.prepareData()
+            }
         }
     }
     
+    
+    func prepareData(_ completion: @escaping () -> Void) {
+        getCurrentUser { user in
+            self.currentUser = user
+            completion()
+        }
+    }
 }
 
 // MARK: - User

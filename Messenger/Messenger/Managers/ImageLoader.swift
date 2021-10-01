@@ -8,6 +8,10 @@
 import UIKit
 import Reachability
 
+var reachability: Reachability {
+    return Reachability()
+}
+
 final class ImageLoader {
     
     static var shared = ImageLoader()
@@ -24,22 +28,6 @@ final class ImageLoader {
 
     @objc
     func reachabilityChanged() {
-        switch reachability.connection {
-        case .cellular:
-            for task in waitingForInternet {
-                task()
-            }
-            waitingForInternet.removeAll()
-        case .wifi:
-            for task in waitingForInternet {
-                task()
-            }
-            waitingForInternet.removeAll()
-        case .none:
-            break
-        case .unavailable:
-            break
-        }
     }
     
     

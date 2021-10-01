@@ -20,9 +20,3 @@ class MapSearchViewController: UIViewController {
     
     
 }
-
-    
-extension MapViewController: CLLocationManagerDelegate{
-    
-
-}
