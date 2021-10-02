@@ -17,13 +17,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         self.window = UIWindow(frame: UIScreen.main.bounds)
 
-        if Auth.auth().currentUser == nil {
+        if DatabaseManager.shared.currentUserID == nil {
 
             let vc = UINavigationController(rootViewController: LoginViewController())
             self.window?.rootViewController = vc
             self.window?.makeKeyAndVisible()
         } else {
-            let vc = UINavigationController(rootViewController: ChatsListController())
+            let vc = TabBarController()
             self.window?.rootViewController = vc
             self.window?.makeKeyAndVisible()
         }

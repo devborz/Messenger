@@ -96,8 +96,9 @@ final class ChatController: UIViewController {
     }
     
     func setupTableView() {
-        tableView = .init({ [weak self] tableView, indexPath, content in
-            guard let self = self else { return nil }
+        let content = node.chatContent
+        tableView = .init(content, provider: { [weak self] tableView, indexPath, content in
+            guard let strongSelf = self else { return nil }
             switch content.type {
             case .message(value: let viewModel):
                 switch viewModel.model.attachment {
@@ -154,8 +155,6 @@ final class ChatController: UIViewController {
         tableView.verticalScrollIndicatorInsets.right = view.frame.width - 9
         
         tableView.separatorStyle = .none
-        
-        reloadChat()
     }
     
     func setupInputBar() {
@@ -317,7 +316,7 @@ extension ChatController: UIGestureRecognizerDelegate {
 
 extension ChatController: InputBarViewDelegate {
     func sendButtonTapped(_ text: String) {
-        if !node.messages.isEmpty {
+        if !tableView.isEmpty {
             tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
         node.sendMessage(.text(text: text))

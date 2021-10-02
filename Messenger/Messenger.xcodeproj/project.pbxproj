@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8D2A74F327091749003926FE /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A74F227091749003926FE /* TabBarController.swift */; };
+		8D2A74F527091874003926FE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A74F427091874003926FE /* ViewController.swift */; };
 		8D409E1E2707C2EB000DC384 /* UserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8D409E1B2707C2EB000DC384 /* UserCell.xib */; };
 		8D409E1F2707C2EB000DC384 /* UserCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D409E1C2707C2EB000DC384 /* UserCellViewModel.swift */; };
 		8D409E202707C2EB000DC384 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D409E1D2707C2EB000DC384 /* UserCell.swift */; };
@@ -70,6 +72,8 @@
 
 /* Begin PBXFileReference section */
 		07FFD31E826129CC9FC9F6C2 /* Pods-Messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.release.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.release.xcconfig"; sourceTree = "<group>"; };
+		8D2A74F227091749003926FE /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		8D2A74F427091874003926FE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		8D409E1B2707C2EB000DC384 /* UserCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserCell.xib; sourceTree = "<group>"; };
 		8D409E1C2707C2EB000DC384 /* UserCellViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserCellViewModel.swift; sourceTree = "<group>"; };
 		8D409E1D2707C2EB000DC384 /* UserCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
@@ -163,6 +167,46 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		8D2A74F6270926C2003926FE /* ChatsTab */ = {
+			isa = PBXGroup;
+			children = (
+				8DF56DD62706FEE60055D0FE /* ChatController.swift */,
+				8DF56E2A27070C0A0055D0FE /* MapSearchViewController.swift */,
+				8DF56E1E27070AD40055D0FE /* CropViewController.swift */,
+				8DF56E2027070AD40055D0FE /* FiImagePickerController.swift */,
+				8DF56E2127070AD50055D0FE /* ImageViewController.swift */,
+				8DF56E2227070AD50055D0FE /* LocationPickerController.swift */,
+				8DF56E1727070A000055D0FE /* LocationViewerController.swift */,
+				8DF56DDB2706FEE70055D0FE /* ChatsListController.swift */,
+				8DF56DED2706FEE90055D0FE /* StartConversationViewController.swift */,
+				8D409E252707C606000DC384 /* MapSearchResultsViewController.swift */,
+			);
+			path = ChatsTab;
+			sourceTree = "<group>";
+		};
+		8D2A74F727092731003926FE /* AccountTab */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = AccountTab;
+			sourceTree = "<group>";
+		};
+		8D2A74F827092744003926FE /* SearchTab */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SearchTab;
+			sourceTree = "<group>";
+		};
+		8D2A74F927092755003926FE /* Authorization */ = {
+			isa = PBXGroup;
+			children = (
+				8DF56DE92706FEE80055D0FE /* LoginViewController.swift */,
+				8DF56DE72706FEE80055D0FE /* RegistrationViewController.swift */,
+			);
+			path = Authorization;
+			sourceTree = "<group>";
+		};
 		8D409E2A2707C9B4000DC384 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -198,22 +242,16 @@
 		8D409E2D2707C9F3000DC384 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				8DF56DD62706FEE60055D0FE /* ChatController.swift */,
-				8DF56E2A27070C0A0055D0FE /* MapSearchViewController.swift */,
+				8D2A74F927092755003926FE /* Authorization */,
+				8D2A74F827092744003926FE /* SearchTab */,
+				8D2A74F727092731003926FE /* AccountTab */,
+				8D2A74F6270926C2003926FE /* ChatsTab */,
 				8DF56E2B27070C0A0055D0FE /* MapViewController.swift */,
 				8DF56E1D27070AD40055D0FE /* CropAvatarViewController.swift */,
-				8DF56E1E27070AD40055D0FE /* CropViewController.swift */,
 				8DF56E1F27070AD40055D0FE /* FiAvatarPickerController.swift */,
-				8DF56E2027070AD40055D0FE /* FiImagePickerController.swift */,
-				8DF56E2127070AD50055D0FE /* ImageViewController.swift */,
-				8DF56E2227070AD50055D0FE /* LocationPickerController.swift */,
-				8DF56E1727070A000055D0FE /* LocationViewerController.swift */,
-				8DF56DDB2706FEE70055D0FE /* ChatsListController.swift */,
-				8DF56DE92706FEE80055D0FE /* LoginViewController.swift */,
-				8DF56DE72706FEE80055D0FE /* RegistrationViewController.swift */,
 				8DF56DE42706FEE80055D0FE /* SettingsViewController.swift */,
-				8DF56DED2706FEE90055D0FE /* StartConversationViewController.swift */,
-				8D409E252707C606000DC384 /* MapSearchResultsViewController.swift */,
+				8D2A74F227091749003926FE /* TabBarController.swift */,
+				8D2A74F427091874003926FE /* ViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -422,12 +460,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DF56E2427070AD50055D0FE /* CropViewController.swift in Sources */,
+				8D2A74F327091749003926FE /* TabBarController.swift in Sources */,
 				8DF56DFB2706FEE90055D0FE /* TextMessageCell.swift in Sources */,
 				8DF56DFF2706FEE90055D0FE /* MessageCell.swift in Sources */,
 				8DF56E2D27070C0A0055D0FE /* MapSearchViewController.swift in Sources */,
 				8DF56E002706FEE90055D0FE /* LocationMessageCell.swift in Sources */,
 				8DF56E062706FEE90055D0FE /* LoginViewController.swift in Sources */,
 				8DF56E092706FEE90055D0FE /* SeenIndicatorCell.swift in Sources */,
+				8D2A74F527091874003926FE /* ViewController.swift in Sources */,
 				8DF56DFE2706FEE90055D0FE /* Observable.swift in Sources */,
 				8DF56DF02706FEE90055D0FE /* ChatNodeUpdateAdapter.swift in Sources */,
 				8DF56DF42706FEE90055D0FE /* Chat.swift in Sources */,

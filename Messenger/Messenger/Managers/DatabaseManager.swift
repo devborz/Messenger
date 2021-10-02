@@ -22,17 +22,15 @@ class DatabaseManager {
     
     var currentUser: User?
     
-    var ref = Firestore.firestore()
+    private var ref = Firestore.firestore()
     
     private init() {
-        DatabaseManager.shared.prepareData {
-//                NotificationsService.shared.prepareData()
+        prepareData {
             ChatsService.shared.prepareData()
         }
         Auth.auth().addStateDidChangeListener { auth, user in
             ChatsManager.shared.removeActiveListeners()
             DatabaseManager.shared.prepareData {
-//                NotificationsService.shared.prepareData()
                 ChatsService.shared.prepareData()
             }
         }

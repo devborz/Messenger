@@ -17,13 +17,13 @@ final class ImageLoader {
     static var shared = ImageLoader()
     
     private init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged), name: NSNotification.Name.reachabilityChanged, object: nil)
-        do {
-            try reachability.startNotifier()
-        }
-        catch(let error) {
-            print("Error occured while starting reachability notifications : \(error.localizedDescription)")
-        }
+//        NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged), name: NSNotification.Name.reachabilityChanged, object: nil)
+////        do {
+////            try reachability.startNotifier()
+////        }
+//        catch(let error) {
+//            print("Error occured while starting reachability notifications : \(error.localizedDescription)")
+//        }
     }
 
     @objc

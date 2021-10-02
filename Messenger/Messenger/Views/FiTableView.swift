@@ -41,6 +41,10 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
         }
     }
     
+    var isEmpty: Bool {
+        return snapshot?.count ?? 0 == 0
+    }
+    
     internal override var dataSource: UITableViewDataSource? {
         get {
             return super.dataSource
@@ -56,10 +60,11 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
         super.init(frame: .zero, style: .plain)
     }
 
-    init(_ provider: @escaping CellsProvider) {
+    init(_ snapshot: FiSnapshot, provider: @escaping CellsProvider) {
         super.init(frame: .zero, style: .plain)
-        cellProvider = provider
-        dataSource = self
+        self.snapshot = snapshot
+        self.cellProvider = provider
+        self.dataSource = self
     }
     
     required init?(coder: NSCoder) {
@@ -67,11 +72,10 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
     }
     
     func reload(snapshot: FiSnapshot) {
-        
-        self.snapshot = []
-//        DispatchQueue.main.async { [weak self] in
-//            self?.reloadData()
-//        }
+        self.snapshot = snapshot
+        DispatchQueue.main.async { [weak self] in
+            self?.reloadData()
+        }
     }
     
     func animateDifference(snapshot: FiSnapshot) {
