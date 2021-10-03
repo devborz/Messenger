@@ -6,21 +6,25 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class ChatTopAvatarView: UIView {
     
     let viewModel: ChatTopAvatarViewModel
     
     let imageView = UIImageView()
+    
+    private let disposeBag = DisposeBag()
 
     init(_ viewModel: ChatTopAvatarViewModel) {
         self.viewModel = viewModel
         super.init(frame: CGRect(x: 0, y: 0, width: 80, height: 35))
-        viewModel.avatar.bind { [weak self] image in
+        viewModel.avatar.subscribe(onNext: { [weak self] image in
             DispatchQueue.main.async {
                 self?.imageView.image = image
             }
-        }
+        }).disposed(by: disposeBag)
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(imageView)
@@ -43,13 +47,13 @@ final class ChatTopAvatarView: UIView {
 
 class ChatTopAvatarViewModel {
     
-    var avatar: Observable<UIImage> = Observable()
+    var avatar: PublishSubject<UIImage> = .init()
     
     init(url: String?) {
         if let url = url {
-//            ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] image in
-//                self?.avatar.value = image
-//            }
+            ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] image in
+                self?.avatar.onNext(image)
+            }
         }
     }
 }

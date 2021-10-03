@@ -98,7 +98,6 @@ final class ChatController: UIViewController {
     func setupTableView() {
         let content = node.chatContent
         tableView = .init(content, provider: { [weak self] tableView, indexPath, content in
-            guard let strongSelf = self else { return nil }
             switch content.type {
             case .message(value: let viewModel):
                 switch viewModel.model.attachment {
@@ -129,7 +128,7 @@ final class ChatController: UIViewController {
                 cell.transform = CGAffineTransform(rotationAngle: .pi)
                 cell.selectionStyle = .none
                 return cell
-            case .seenIndicator(value: let _):
+            case .seenIndicator:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "seen", for: indexPath) as! SeenIndicatorCell
                 cell.transform = CGAffineTransform(rotationAngle: .pi)
                 cell.selectionStyle = .none

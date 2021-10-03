@@ -17,8 +17,6 @@ class ChatsListController: UITableViewController {
         ChatsService.shared.delegate = self
         
         navigationItem.title = NSLocalizedString("Chats", comment: "")
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.backButtonTitle = " "
         
         tableView.register(UINib(nibName: "ChatTableViewCell", bundle: nil), forCellReuseIdentifier: "cell")

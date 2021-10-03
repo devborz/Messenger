@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 
 enum MessageState {
     case normal
@@ -73,15 +74,17 @@ final class MessageViewModel: Hashable {
     
     var type: MessageKind
     
-    var senderAvatar: Observable<UIImage> = Observable()
+    var senderAvatar: BehaviorSubject<UIImage> = .init(value: .init())
     
-    var messagePhoto: Observable<UIImage> = Observable()
+    var messagePhoto: BehaviorSubject<UIImage?> = .init(value: nil)
+    
+    private let disposeBag = DisposeBag()
     
     var eventIsNotAvailable = false
     
     var messageLocation: Location?
     
-    var state: DefinedObservable<MessageState> = DefinedObservable(.normal)
+    var state: BehaviorSubject<MessageState> = .init(value: .normal)
     
     init(_ model: Message, sender: User) {
         self.model = model
@@ -97,22 +100,21 @@ final class MessageViewModel: Hashable {
             messageLocation = location
         case .image(url: let url):
             ImageLoader.shared.downloadImageFromURL(url) { [weak self] image in
-                self?.messagePhoto.value = image
+                self?.messagePhoto.onNext(image)
             }
-            break
         }
         if let url = sender.c_avatarURL {
             ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] image in
-                self?.senderAvatar.value = image
+                self?.senderAvatar.onNext(image)
             }
         } else {
-            self.senderAvatar.value = UIImage(systemName: "person.crop.circle")
+            self.senderAvatar.onNext(UIImage(systemName: "person.crop.circle") ?? UIImage())
         }
     }
     
     init(_ id: String, newMessage: MessageContent, sender: User) {
         let uid = DatabaseManager.shared.currentUserID ?? ""
-        state.value = .sending
+        state.onNext(.sending)
         type = .outgoing
         let date = Date()
         switch newMessage {
@@ -120,17 +122,17 @@ final class MessageViewModel: Hashable {
             model = .init(id: id, type: .text, text: text, created: date, updated: date, senderID: uid, attachment: .empty)
         case .image(image: let image):
             model = .init(id: id, type: .image, text: "", created: date, updated: date, senderID: uid, attachment: .image(url: ""))
-            messagePhoto.value = image
+            messagePhoto.onNext(image)
         case .location(location: let location):
             model = .init(id: id, type: .location, text: "", created: date, updated: date, senderID: uid, attachment: .location(location: location))
             messageLocation = location
         }
         if let url = sender.c_avatarURL {
-//            ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] image in
-//                self?.senderAvatar.value = image
-//            }
+            ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] image in
+                self?.senderAvatar.onNext(image)
+            }
         } else {
-            self.senderAvatar.value = UIImage(systemName: "person.crop.circle")
+            self.senderAvatar.onNext(UIImage(systemName: "person.crop.circle") ?? UIImage())
         }
     }
 }

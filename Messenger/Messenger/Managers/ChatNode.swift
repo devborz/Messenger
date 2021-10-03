@@ -82,7 +82,7 @@ class ChatNode {
     
     func shouldUpdate() {
         if let lastMessage = messages.first?.model  {
-            if let previousLastMessage = listCellViewModel?.lastMessage.value {
+            if let previousLastMessage =  try? listCellViewModel?.lastMessage.value() {
                 if lastMessage.id != previousLastMessage.id {
                     ChatsService.shared.changeLastMessage(self, message: lastMessage)
                 }
@@ -107,7 +107,7 @@ class ChatNode {
     
     func sendMessage(_ messageContent: MessageContent) {
         let id = UUID().uuidString
-        guard let user = DatabaseManager.shared.currentUser else { return }
+        guard let user = try? DatabaseManager.shared.currentUser.value() else { return }
         
         let messageViewModel = MessageViewModel(id, newMessage: messageContent, sender: user)
         messages.insert(messageViewModel, at: 0)

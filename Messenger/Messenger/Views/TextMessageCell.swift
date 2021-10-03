@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import RxSwift
 
 final class TextMessageCell: MessageCell {
     
     let contentLabel = UILabel()
+    
+    private var disposeBag = DisposeBag()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -58,9 +61,8 @@ final class TextMessageCell: MessageCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        viewModel?.senderAvatar.removeListener()
-        viewModel?.state.removeListener()
         viewModel = nil
+        disposeBag = DisposeBag()
     }
     
     func layout() {
@@ -112,12 +114,12 @@ final class TextMessageCell: MessageCell {
         bubbleView.layer.cornerRadius = 15
         bubbleView.clipsToBounds = true
         layout()
-        viewModel.senderAvatar.bind { [weak self] image in
+        viewModel.senderAvatar.subscribe(onNext: { [weak self] image in
             DispatchQueue.main.async {
                 self?.avatarImageView.image = image
             }
-        }
-        viewModel.state.bind { [weak self] state in
+        }).disposed(by: disposeBag)
+        viewModel.state.subscribe(onNext: { [weak self] state in
             var image: UIImage?
             var tintColor: UIColor = .systemIndigo
             switch state {
@@ -135,6 +137,6 @@ final class TextMessageCell: MessageCell {
                 self?.stateImageView.image = image
                 self?.stateImageView.tintColor = tintColor
             }
-        }
+        }).disposed(by: disposeBag)
     }
 }

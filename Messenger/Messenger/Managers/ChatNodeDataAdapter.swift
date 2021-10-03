@@ -7,6 +7,8 @@
 
 import Foundation
 import FirebaseDatabase
+import RxCocoa
+import RxSwift
 
 class ChatNodeDataAdapter {
     
@@ -16,7 +18,7 @@ class ChatNodeDataAdapter {
     
     var otherUser: User
     
-    var otherUserImage: Observable<UIImage> = Observable()
+    var otherUserImage: PublishSubject<UIImage> = .init()
     
     var deletedMessages: Set<MessageViewModel> = Set()
     
@@ -27,9 +29,10 @@ class ChatNodeDataAdapter {
     var isReading: Bool = false {
         didSet {
             guard let chat = chat,
-                  let viewModel = node.listCellViewModel else { return }
-            if viewModel.unread.value > 0 {
-                viewModel.unread.value = 0
+                  let viewModel = node.listCellViewModel,
+                  let unread = try? viewModel.unread.value() else { return }
+            if unread > 0 {
+                viewModel.unread.onNext(0)
                 ChatsManager.shared.readChat(chat.id)
             }
         }
@@ -72,7 +75,7 @@ class ChatNodeDataAdapter {
     
     private func dowloadMessages() {
         guard let chat = chat else { return }
-        guard let user = DatabaseManager.shared.currentUser else { return }
+        guard let user = try? DatabaseManager.shared.currentUser.value() else { return }
         ChatsManager.shared.getMessagesOfChat(chat) { [weak self] messages in
             guard let self = self else { return }
             var viewModels: [MessageViewModel] = []
@@ -85,13 +88,14 @@ class ChatNodeDataAdapter {
             
             self.listenNewMessages()
         }
+        
     }
     
     // MARK: Listeners
     
     private func listenNewMessages() {
         let chatID = generateChatIDWithUser(userID: otherUser.id)
-        guard let user = DatabaseManager.shared.currentUser else { return }
+        guard let user = try? DatabaseManager.shared.currentUser.value() else { return }
         messagesReference = ChatsManager.shared.listenUpdatesInChat(chatID) { [weak self] messages in
             guard let self = self else { return }
         
@@ -115,7 +119,7 @@ class ChatNodeDataAdapter {
         ChatsManager.shared.listenChatReadState(chat.id) { [weak self] unread in
             guard let strongSelf = self else { return }
             strongSelf.chat.unread = strongSelf.isReading ? 0 : unread
-            strongSelf.node.listCellViewModel?.unread.value = strongSelf.isReading ? 0 : unread
+            strongSelf.node.listCellViewModel?.unread.onNext(strongSelf.isReading ? 0 : unread)
             ChatsService.shared.countUnreadChats()
             if unread > 0 && strongSelf.isReading {
                 ChatsManager.shared.readChat(chat.id)
@@ -145,12 +149,12 @@ class ChatNodeDataAdapter {
                     self?.chat = chat
                     self?.isNew = false
                 } sendingResult: { state in
-                    viewModel.state.value = state
+                    viewModel.state.onNext(state)
                 }
             } else {
                 guard let chat = self.chat else { return }
                 ChatsManager.shared.sendMessage(messageID: viewModel.model.id, chatID: chat.id, otherUserID: otherUser.id, content: content) { state in
-                    viewModel.state.value = state
+                    viewModel.state.onNext(state)
                 }
             }
         }

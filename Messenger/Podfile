@@ -13,6 +13,7 @@ target 'Messenger' do
   pod 'Firebase/Storage'
   pod 'Reachability'
   pod 'RxSwift'
+  pod 'RxCocoa'
   pod 'Realm'
   pod 'Alamofire'
 

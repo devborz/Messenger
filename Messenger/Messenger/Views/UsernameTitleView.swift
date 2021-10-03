@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 protocol UsernameTitleViewDelegate: AnyObject {
     func titleViewTapped(userID: String)
@@ -24,6 +26,8 @@ final class UsernameTitleView: UIView {
     var imageViewConstraint: NSLayoutConstraint!
     
     var tapGestureRecognizer: UITapGestureRecognizer!
+    
+    private let disposebag = DisposeBag()
 
     init(_ viewModel: UsernameTitleViewModel) {
         self.viewModel = viewModel
@@ -53,9 +57,11 @@ final class UsernameTitleView: UIView {
         verifiedImageView.contentMode = .scaleAspectFill
         
         
-        viewModel.username.bind { [weak self] value in
-            self?.usernameLabel.text = value
-        }
+        viewModel.username.subscribe(onNext: { [weak self] value in
+            DispatchQueue.main.async {
+                self?.usernameLabel.text = value
+            }
+        }).disposed(by: disposebag)
     }
     
     required init?(coder: NSCoder) {
@@ -72,18 +78,17 @@ class UsernameTitleViewModel {
     
     var userID: String
 
-    var username: Observable<String> = Observable()
+    var username: BehaviorSubject<String> = .init(value: "")
     
     init(_ userID: String) {
         self.userID = userID
         DatabaseManager.shared.getUser(userID) { user in
-            self.username.value = user.username
+            self.username.onNext(user.username)
         }
     }
     
     init(_ user: User) {
         userID = user.id
-        username.value = user.username
-//        isVerified.value = user.isVerified
+        username.onNext(user.username)
     }
 }

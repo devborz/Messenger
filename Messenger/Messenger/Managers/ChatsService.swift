@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 protocol ChatsServiceDelegate: AnyObject {
     func update()
@@ -29,7 +31,7 @@ final class ChatsService {
         return prepareList()
     }
     
-    var countOfUnreadChats: PredefinedObservable<Int> = .init(0)
+    var countOfUnreadChats: BehaviorSubject<Int> = .init(value: 0)
     
     private var deletedNodes: [ChatNode] = []
     
@@ -65,9 +67,10 @@ final class ChatsService {
             var newNodes: [ChatNode] = []
             
             for chat in chats {
-                
                 guard !strongSelf.deletedNodes.contains(where: { value in
-                    return value.listCellViewModel?.lastMessage.value?.id == chat.lastMessage.id
+                    
+                    guard let lastMessageID = try? value.listCellViewModel.lastMessage.value()?.id else { return false }
+                    return lastMessageID == chat.lastMessage.id
                 }) else { continue }
                 
                 newNodes.append(.init(chat))
@@ -90,12 +93,12 @@ final class ChatsService {
                 count += 1
             }
         }
-        countOfUnreadChats.value = count
+        countOfUnreadChats.onNext(count)
     }
     
     func changeLastMessage(_ node: ChatNode, message: Message) {
         guard let viewModel = node.listCellViewModel else { return }
-        viewModel.lastMessage.value = message
+        viewModel.lastMessage.onNext(message)
         update()
     }
     

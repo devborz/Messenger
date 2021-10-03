@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxCocoa
+import RxSwift
 
 extension UIImage {
     enum JPEGQuality: CGFloat {
@@ -35,4 +37,10 @@ extension UIImage {
             self.draw(in: CGRect(origin: .zero, size: newSize))
         }
     }
+}
+
+
+extension PublishSubject {
+    // because this is a snapshot of a value in time
+    
 }

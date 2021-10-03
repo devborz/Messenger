@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class UserCellViewModel {
     var user: User
@@ -14,7 +16,7 @@ class UserCellViewModel {
         return user.username
     }
     
-    var avatar: Observable<UIImage> = Observable()
+    var avatar: BehaviorSubject<UIImage> = .init(value: .init())
     
     init(with model: User) {
         user = model
@@ -24,10 +26,10 @@ class UserCellViewModel {
     func getAvatar(_ url: String?) {
         if let url = url {
             ImageLoader.shared.downloadImageFromURL(url, size: 50) { [weak self] avatar in
-                self?.avatar.value = avatar
+                self?.avatar.onNext(avatar)
             }
         } else {
-            self.avatar.value = UIImage(systemName: "person.crop.circle")
+            self.avatar.onNext(UIImage(systemName: "person.crop.circle")!)
         }
     }
 }

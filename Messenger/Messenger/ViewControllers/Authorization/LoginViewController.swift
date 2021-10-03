@@ -93,10 +93,9 @@ class LoginViewController: UIViewController {
         Auth.auth().signIn(withEmail: email, password: password) { result, error in
             guard error == nil else { return }
             
-            let vc = ChatsListController()
-            let navigationController = UINavigationController(rootViewController: vc)
-            navigationController.modalPresentationStyle = .fullScreen
-            self.present(navigationController, animated: true, completion: nil)
+            let vc = TabBarController()
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true, completion: nil)
         }
     }
 

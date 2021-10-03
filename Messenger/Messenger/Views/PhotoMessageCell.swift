@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import RxSwift
 
 final class PhotoMessageCell: MessageCell {
     
     let photoImageView = UIImageView()
+    
+    private var disposeBag = DisposeBag()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -67,10 +70,8 @@ final class PhotoMessageCell: MessageCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        viewModel?.senderAvatar.removeListener()
-        viewModel?.state.removeListener()
-        viewModel?.messagePhoto.removeListener()
         viewModel = nil
+        disposeBag = DisposeBag()
     }
     
     @objc
@@ -78,7 +79,7 @@ final class PhotoMessageCell: MessageCell {
         switch viewModel.model.attachment {
         case .image(url: let url):
             if url.isEmpty {
-                if let image = viewModel.messagePhoto.value {
+                if let image = try? viewModel.messagePhoto.value() {
                     delegate?.photoTapped(cell: self, image: image)
                 }
             } else {
@@ -126,17 +127,17 @@ final class PhotoMessageCell: MessageCell {
         photoImageView.clipsToBounds = true
         timeLabel.text = formatMessageTime(viewModel.model.created)
         layout()
-        viewModel.senderAvatar.bind { [weak self] image in
+        viewModel.senderAvatar.subscribe(onNext: { [weak self] image in
             DispatchQueue.main.async {
                 self?.avatarImageView.image = image
             }
-        }
-        viewModel.messagePhoto.bind { [weak self] image in
+        }).disposed(by: disposeBag)
+        viewModel.messagePhoto.subscribe(onNext:  { [weak self] image in
             DispatchQueue.main.async {
                 self?.photoImageView.image = image
             }
-        }
-        viewModel.state.bind { [weak self] state in
+        }).disposed(by: disposeBag)
+        viewModel.state.subscribe(onNext:  { [weak self] state in
             var image: UIImage?
             var tintColor: UIColor = .systemIndigo
             switch state {
@@ -154,6 +155,6 @@ final class PhotoMessageCell: MessageCell {
                 self?.stateImageView.image = image
                 self?.stateImageView.tintColor = tintColor
             }
-        }
+        }).disposed(by: disposeBag)
     }
 }

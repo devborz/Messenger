@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 
 class ChatTableViewCell: UITableViewCell {
     
@@ -23,6 +24,8 @@ class ChatTableViewCell: UITableViewCell {
     
     var viewModel: ChatCellViewModel!
     
+    private var disposeBag = DisposeBag()
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         chatImageView.tintColor = avatarTintColor
@@ -32,15 +35,13 @@ class ChatTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        viewModel?.otherUserImage.removeListener()
-        viewModel?.unread.removeListener()
-        viewModel?.lastMessage.removeListener()
+        disposeBag = DisposeBag()
         viewModel = nil
     }
     
     func setup(_ viewModel: ChatCellViewModel) {
         self.viewModel = viewModel
-        viewModel.lastMessage.bind { [weak self] message in
+        viewModel.lastMessage.subscribe(onNext: { [weak self] message in
             guard let message = message else { return }
             if message.senderID == DatabaseManager.shared.currentUserID {
                 DispatchQueue.main.async {
@@ -53,19 +54,14 @@ class ChatTableViewCell: UITableViewCell {
                     self?.timeLabel.text = self?.formatMessageDate(message.created)
                 }
             }
-        }
+        }).disposed(by: disposeBag)
         self.chatNameLabel.text = viewModel.otherUserInfo.username
-//        if viewModel.otherUserInfo.isVerified {
-//            self.verifiedImageView.image = UIImage(systemName: "checkmark.seal.fill")
-//        } else {
-//            self.verifiedImageView.image = nil
-//        }
-        viewModel.otherUserImage.bind { [weak self] image in
+        viewModel.otherUserImage.subscribe(onNext: { [weak self] image in
             DispatchQueue.main.async {
                 self?.chatImageView.image = image
             }
-        }
-        viewModel.unread.bind { [weak self] value in
+        }).disposed(by: disposeBag)
+        viewModel.unread.subscribe(onNext: { [weak self] value in
             if value == 0 {
                 DispatchQueue.main.async {
                     self?.chatStateImageView.image = nil
@@ -75,7 +71,7 @@ class ChatTableViewCell: UITableViewCell {
                     self?.chatStateImageView.image = UIImage(systemName: "\(value).circle.fill")
                 }
             }
-        }
+        }).disposed(by: disposeBag)
     }
     
     private func formatMessageDate(_ messageDate: Date) -> String {

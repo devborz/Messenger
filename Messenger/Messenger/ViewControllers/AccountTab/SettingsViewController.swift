@@ -1,12 +1,12 @@
 //
-//  SettingsViewController.swift
+//  AccountViewController.swift
 //  Messenger
 //
-//  Created by Усман Туркаев on 21.08.2021.
+//  Created by Усман Туркаев on 03.10.2021.
 //
 
 import UIKit
-import Firebase
+import FirebaseAuth
 
 class SettingsViewController: UITableViewController {
 
@@ -14,32 +14,51 @@ class SettingsViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.title = "Settings"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        setupCells()
+    }
+    
+    func setupCells() {
+        tableView.register(UINib(nibName: "CurrentAccountCell", bundle: nil), forCellReuseIdentifier: "account")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
     }
 
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
+        return 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
         return 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        if indexPath.row == 0 {
-            cell.textLabel?.text = "Sign out"
-            cell.textLabel?.textColor = .red
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "account", for: indexPath) as! CurrentAccountCell
+            cell.setup()
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            var config = cell.defaultContentConfiguration()
+            config.text = "Sign Out"
+            config.textProperties.color = .red
+            cell.contentConfiguration = config
+            return cell
         }
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        signOut()
+        if indexPath.section == 1 {
+            signOut()
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 0 {
+            return 120
+        }
+        return 40
     }
     
     func signOut() {
@@ -62,4 +81,5 @@ class SettingsViewController: UITableViewController {
                               animations: nil,
                               completion: nil)
     }
+
 }

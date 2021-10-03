@@ -7,6 +7,8 @@
 
 import UIKit
 import Firebase
+import RxSwift
+import RxCocoa
 
 class DatabaseManager {
     
@@ -20,7 +22,7 @@ class DatabaseManager {
         return Auth.auth().currentUser?.uid
     }
     
-    var currentUser: User?
+    var currentUser = BehaviorSubject<User?>(value: nil)
     
     private var ref = Firestore.firestore()
     
@@ -29,6 +31,7 @@ class DatabaseManager {
             ChatsService.shared.prepareData()
         }
         Auth.auth().addStateDidChangeListener { auth, user in
+            ChatsService.shared.prepareData()
             ChatsManager.shared.removeActiveListeners()
             DatabaseManager.shared.prepareData {
                 ChatsService.shared.prepareData()
@@ -38,8 +41,8 @@ class DatabaseManager {
     
     
     func prepareData(_ completion: @escaping () -> Void) {
-        getCurrentUser { user in
-            self.currentUser = user
+        getCurrentUser { [weak self] user in
+            self?.currentUser.onNext(user)
             completion()
         }
     }

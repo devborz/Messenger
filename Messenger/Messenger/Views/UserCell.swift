@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 
 class UserCell: UITableViewCell {
     
@@ -17,6 +18,7 @@ class UserCell: UITableViewCell {
     
     var viewModel: UserCellViewModel!
     
+    private var disposeBag = DisposeBag()
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -27,17 +29,17 @@ class UserCell: UITableViewCell {
         super.prepareForReuse()
         avatarImageView.image = nil
         usernameLabel.text = nil
-        viewModel?.avatar.removeListener()
         viewModel = nil
+        disposeBag = DisposeBag()
     }
 
     func setup(_ viewModel: UserCellViewModel) {
         self.viewModel = viewModel
         usernameLabel.text = viewModel.username
-        viewModel.avatar.bind { [weak self] image in
+        viewModel.avatar.subscribe(onNext: { [weak self] image in
             DispatchQueue.main.async {
                 self?.avatarImageView.image = image
             }
-        }
+        }).disposed(by: disposeBag)
     }
 }

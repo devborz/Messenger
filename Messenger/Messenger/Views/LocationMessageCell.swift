@@ -7,10 +7,13 @@
 
 import UIKit
 import MapKit
+import RxSwift
 
 final class LocationMessageCell: MessageCell {
     
     let mapView = MKMapView()
+    
+    private var disposeBag = DisposeBag()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -66,9 +69,8 @@ final class LocationMessageCell: MessageCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        viewModel?.senderAvatar.removeListener()
-        viewModel?.state.removeListener()
         viewModel = nil
+        disposeBag = DisposeBag()
     }
     
     @objc
@@ -127,12 +129,12 @@ final class LocationMessageCell: MessageCell {
             annotation.coordinate = location.coordinate
             mapView.addAnnotation(annotation)
         }
-        viewModel.senderAvatar.bind { [weak self] image in
+        viewModel.senderAvatar.subscribe(onNext: { [weak self] image in
             DispatchQueue.main.async {
                 self?.avatarImageView.image = image
             }
-        }
-        viewModel.state.bind { [weak self] state in
+        }).disposed(by: disposeBag)
+        viewModel.state.subscribe(onNext: { [weak self] state in
             var image: UIImage?
             var tintColor: UIColor = .systemIndigo
             switch state {
@@ -151,6 +153,7 @@ final class LocationMessageCell: MessageCell {
                 self?.stateImageView.tintColor = tintColor
             }
             
-        }
+        }).disposed(by: disposeBag)
+
     }
 }

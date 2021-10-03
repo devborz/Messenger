@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class StartConversationViewController: UITableViewController {
     
@@ -16,6 +18,8 @@ class StartConversationViewController: UITableViewController {
     var cancelBarItem: UIBarButtonItem!
     
     var searchController: UISearchController!
+    
+    private let disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,11 +37,11 @@ class StartConversationViewController: UITableViewController {
         tableView.register(UINib(nibName: "UserCell", bundle: nil), forCellReuseIdentifier: "PersonCell")
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         tableView.tableFooterView = UIView()
-        viewModel.presentingUsers.bind { [weak self] _ in
+        viewModel.presentingUsers.subscribe(onNext: { [weak self] _ in
             DispatchQueue.main.async {
                 self?.tableView.reloadData()
             }
-        }
+        }).disposed(by: disposeBag)
     }
     
     @objc
@@ -52,12 +56,18 @@ class StartConversationViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.presentingUsers.value.count
+        guard let users = try? viewModel.presentingUsers.value() else {
+            return 0
+        }
+        return users.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PersonCell", for: indexPath) as! UserCell
-        cell.setup(viewModel.presentingUsers.value[indexPath.row])
+        guard let users = try? viewModel.presentingUsers.value() else {
+            return cell
+        }
+        cell.setup(users[indexPath.row])
         return cell
     }
 
@@ -67,8 +77,11 @@ class StartConversationViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        guard let users = try? viewModel.presentingUsers.value() else {
+            return
+        }
         navigationController?.dismiss(animated: true) {
-            self.delegate?.didSelectedUserWithID(self.viewModel.presentingUsers.value[indexPath.row].user)
+            self.delegate?.didSelectedUserWithID(users[indexPath.row].user)
         }
     }
 
@@ -92,7 +105,7 @@ class StartConversationViewModel {
     
     var users: [User] = []
 
-    var presentingUsers: PredefinedObservable<[UserCellViewModel]> = PredefinedObservable([])
+    var presentingUsers: BehaviorSubject<[UserCellViewModel]> = BehaviorSubject(value: [])
     
     init() {
         DatabaseManager.shared.getUsers { [weak self] users in
@@ -103,7 +116,7 @@ class StartConversationViewModel {
                 }
             }
             self?.users = users
-            self?.presentingUsers.value = viewModels
+            self?.presentingUsers.onNext(viewModels)
         }
     }
     
@@ -115,7 +128,7 @@ class StartConversationViewModel {
                 viewModels.append(.init(with: user))
             }
         }
-        self.presentingUsers.value = viewModels
+        self.presentingUsers.onNext(viewModels)
     }
     
     func showAll() {
@@ -123,7 +136,7 @@ class StartConversationViewModel {
         for user in users {
                 viewModels.append(.init(with: user))
         }
-        self.presentingUsers.value = viewModels
+        self.presentingUsers.onNext(viewModels)
     }
 }
 
