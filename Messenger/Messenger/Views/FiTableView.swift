@@ -95,6 +95,16 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
         self.snapshot = nextSnapshot
         self.nextSnapshot = nil
         
+        var positions: [T : IndexPath] = [:]
+        var newPositions: [T : IndexPath] = [:]
+        
+        for (i, identificator) in snapshot.enumerated() {
+            positions[identificator] = IndexPath(row: i, section: 0)
+        }
+        for (i, identificator) in nextSnapshot.enumerated() {
+            newPositions[identificator] = IndexPath(row: i, section: 0)
+        }
+        
         let oldSet: Set<T> = Set(snapshot)
         let newSet: Set<T> = Set(nextSnapshot)
 
@@ -108,16 +118,27 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
         
         var deletingIndexPaths: [IndexPath] = []
         var insertingIndexPaths: [IndexPath] = []
+        var movingRows: [(from: IndexPath, to: IndexPath)] = []
         
         for deletedItem in deletedItems {
-            if let index = snapshot.firstIndex(of: deletedItem) {
-                print(index)
-                deletingIndexPaths.append(IndexPath(row: index, section: 0))
+            if let indexPath = positions[deletedItem] {
+                deletingIndexPaths.append(indexPath)
             }
         }
         
-        for index in 0..<insertedItems.count {
-            insertingIndexPaths.append(.init(row: index, section: 0))
+        for insertedItem in insertedItems {
+            if let indexPath = newPositions[insertedItem] {
+                insertingIndexPaths.append(indexPath)
+            }
+        }
+        
+        for item in positions.keys {
+            if let newPosition = newPositions[item],
+                let position = positions[item] {
+                if newPosition.row != position.row {
+                    movingRows.append((from: position, to: newPosition))
+                }
+            }
         }
         
         guard insertingIndexPaths.count + deletingIndexPaths.count == oldSet.symmetricDifference(newSet).count else {
@@ -130,6 +151,9 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
                 guard let strongSelf = self else { return }
                 strongSelf.deleteRows(at: deletingIndexPaths, with: .fade)
                 strongSelf.insertRows(at: insertingIndexPaths, with: .top)
+                for movingRow in movingRows {
+                    strongSelf.moveRow(at: movingRow.from, to: movingRow.to)
+                }
             } completion: { [weak self] completed in
                 guard let strongSelf = self else { return }
                 strongSelf.isUpdating = false

@@ -124,7 +124,8 @@ class StartConversationViewModel {
         let text = text.lowercased()
         var viewModels: [UserCellViewModel] = []
         for user in users {
-            if user.username.contains(text) {
+            if user.id != DatabaseManager.shared.currentUserID &&
+                user.username.contains(text) {
                 viewModels.append(.init(with: user))
             }
         }
@@ -134,7 +135,9 @@ class StartConversationViewModel {
     func showAll() {
         var viewModels: [UserCellViewModel] = []
         for user in users {
+            if user.id != DatabaseManager.shared.currentUserID {
                 viewModels.append(.init(with: user))
+            }
         }
         self.presentingUsers.onNext(viewModels)
     }

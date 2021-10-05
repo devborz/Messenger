@@ -26,7 +26,11 @@ final class LocationViewerController: UIViewController, CLLocationManagerDelegat
         
         definesPresentationContext = true
         navigationItem.hidesSearchBarWhenScrolling = false
-        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
         setupMapView()
     }
     

@@ -47,7 +47,7 @@ final class LocationPickerController: UIViewController, CLLocationManagerDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.largeTitleDisplayMode = .never
+//        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = NSLocalizedString("Location", comment: "")
         
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelButtonTapped))
@@ -65,11 +65,15 @@ final class LocationPickerController: UIViewController, CLLocationManagerDelegat
         view.backgroundColor = .systemBackground
         searchResultsController.mapView = mapView
         searchResultsController.handleMapSearchDelegate = self
-            
-        definesPresentationContext = true
+
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
-
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
         
         setupMapView()
         checkPermissions()

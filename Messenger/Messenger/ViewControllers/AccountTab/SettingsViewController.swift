@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 
 class SettingsViewController: UITableViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Settings"
@@ -36,6 +36,7 @@ class SettingsViewController: UITableViewController {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "account", for: indexPath) as! CurrentAccountCell
             cell.setup()
+            cell.delegate = self
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
@@ -81,5 +82,35 @@ class SettingsViewController: UITableViewController {
                               animations: nil,
                               completion: nil)
     }
+}
 
+extension SettingsViewController: CurrentAccountCellDelegate {
+    
+    func didTapAvatar() {
+        let alert = UIAlertController(title: "", message: "", preferredStyle: .actionSheet)
+        let addAction = UIAlertAction(title: "Add new photo", style: .default, handler: { _ in
+            let vc = FiAvatarPickerController(collectionViewLayout: UICollectionViewFlowLayout())
+            vc.delegate = self
+            let nav = UINavigationController(rootViewController: vc)
+            self.present(nav, animated: true, completion: nil)
+        })
+        let deleteAction = UIAlertAction(title: "Delete photo", style: .destructive, handler: { _ in
+            DatabaseManager.shared.removeCurrentUserAvatar()
+        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alert.addAction(addAction)
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+}
+
+extension SettingsViewController: FiAvatarPickerControllerDelegate {
+    func didSelect(_ controller: FiAvatarPickerController, image: UIImage) {
+        DatabaseManager.shared.setCurrentUserAvatar(image) {
+            
+        }
+    }
+    
+    
 }

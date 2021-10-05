@@ -8,7 +8,13 @@
 import UIKit
 import RxSwift
 
+protocol CurrentAccountCellDelegate: AnyObject {
+    func didTapAvatar()
+}
+
 class CurrentAccountCell: UITableViewCell {
+    
+    weak var delegate: CurrentAccountCellDelegate?
     
     var viewModel: CurrentAccountCellViewModel?
     
@@ -23,6 +29,10 @@ class CurrentAccountCell: UITableViewCell {
         avatarView.tintColor = avatarTintColor
         avatarView.layer.cornerRadius = 50
         avatarView.clipsToBounds = true
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(imageTapped))
+        avatarView.isUserInteractionEnabled = true
+        avatarView.addGestureRecognizer(gesture)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -32,6 +42,11 @@ class CurrentAccountCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         viewModel = nil
+    }
+    
+    @objc
+    func imageTapped() {
+        delegate?.didTapAvatar()
     }
     
     func setup() {

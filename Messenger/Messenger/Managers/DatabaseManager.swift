@@ -6,7 +6,8 @@
 //
 
 import UIKit
-import Firebase
+import FirebaseAuth
+import FirebaseFirestore
 import RxSwift
 import RxCocoa
 
@@ -23,6 +24,8 @@ class DatabaseManager {
     }
     
     var currentUser = BehaviorSubject<User?>(value: nil)
+    
+    var listeners: [ListenerRegistration] = []
     
     private var ref = Firestore.firestore()
     
@@ -41,7 +44,11 @@ class DatabaseManager {
     
     
     func prepareData(_ completion: @escaping () -> Void) {
-        getCurrentUser { [weak self] user in
+        for listener in listeners {
+            listener.remove()
+        }
+        listeners = []
+        listenCurrentUser() { [weak self] user in
             self?.currentUser.onNext(user)
             completion()
         }
@@ -61,6 +68,13 @@ extension DatabaseManager {
                     completion(user)
                 }
             }
+        }
+    }
+    
+    func listenCurrentUser(_ completion: @escaping (User) -> Void) {
+        guard let uid = currentUserID else { return }
+        listenUser(uid) { user in
+            completion(user)
         }
     }
     
@@ -90,6 +104,18 @@ extension DatabaseManager {
         }
     }
     
+    func listenUser(_ id: String, completion: @escaping (User) -> Void) {
+        let listener = ref.collection("users").document(id).addSnapshotListener { snapshot, error in
+            guard error == nil else { return }
+            if let data = snapshot?.data() {
+                if let user = User(dictionary: data) {
+                    completion(user)
+                }
+            }
+        }
+        listeners.append(listener)
+    }
+    
     func createUser(_ username: String, id: String, completion: @escaping (Error?) -> Void) {
         ref.collection("users").document(id).setData([
             "username" : username.lowercased(),
@@ -97,5 +123,30 @@ extension DatabaseManager {
         ]) { error in
             completion(error)
         }
+    }
+    
+    func setCurrentUserAvatar(_ image: UIImage, completion: (() -> Void)? = nil) {
+        guard let uid = currentUserID else {
+            return
+        }
+        StorageManager.shared.setCurrentUserAvatar(image) { url in
+            self.ref.collection("users").document(uid).updateData([
+                "avatarURL" : url.fullSizeURL,
+                "c_avatarURL" : url.compressedURL
+            ]) { error in
+                guard error == nil else { return }
+                completion?()
+            }
+        }
+    }
+    
+    func removeCurrentUserAvatar() {
+        guard let uid = currentUserID else {
+            return
+        }
+        ref.collection("users").document(uid).updateData([
+            "avatarURL" : FieldValue.delete(),
+            "c_avatarURL" : FieldValue.delete()
+        ])
     }
 }

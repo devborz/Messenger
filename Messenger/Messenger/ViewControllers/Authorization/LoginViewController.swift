@@ -24,6 +24,8 @@ class LoginViewController: UIViewController {
     let loginButton = UIButton()
     
     var registerItem: UIBarButtonItem!
+    
+    var constraint: NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,13 +34,29 @@ class LoginViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
+        emailTextField.translatesAutoresizingMaskIntoConstraints = false
+        passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        loginButton.translatesAutoresizingMaskIntoConstraints = false
+        
         view.addSubview(emailTextField)
         view.addSubview(passwordTextField)
         view.addSubview(loginButton)
         
-        emailTextField.frame = CGRect(x: 20, y: view.frame.height / 2 - 50, width: view.frame.width - 40, height: 40)
-        passwordTextField.frame = CGRect(x: 20, y: emailTextField.bottom + 20, width: view.frame.width - 40, height: 40)
-        loginButton.frame = CGRect(x: 20, y: passwordTextField.bottom + 20, width: view.frame.width - 40, height: 50)
+        emailTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
+        emailTextField.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        emailTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        
+        passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 20).isActive = true
+        passwordTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
+        passwordTextField.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        passwordTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        
+        loginButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 20).isActive = true
+        loginButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
+        loginButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        loginButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        constraint = loginButton.bottomAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.height / 2 + 150)
+        constraint.isActive = true
         
         emailTextField.backgroundColor = .secondarySystemBackground
         emailTextField.placeholder = "Email"
@@ -54,14 +72,13 @@ class LoginViewController: UIViewController {
         passwordTextField.autocorrectionType = .no
         passwordTextField.autocapitalizationType = .none
         
-        
         loginButton.backgroundColor = .systemBlue
         loginButton.setTitle("Login", for: .normal)
         loginButton.setTitleColor(.white, for: .normal)
         loginButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         loginButton.setTitleColor(.lightGray, for: .highlighted)
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
-        loginButton.layer.cornerRadius = 10
+        loginButton.layer.cornerRadius = 15
         loginButton.clipsToBounds = true
         
         registerItem = .init(title: "Register", style: .plain, target: self, action: #selector(registerButtonTapped))
@@ -69,6 +86,38 @@ class LoginViewController: UIViewController {
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
         view.addGestureRecognizer(gesture)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        addKeyboardObservers()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeKeyboardObservers()
+    }
+    
+    func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardChanged(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+    
+    func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc
+    func keyboardChanged(_ notification: NSNotification) {
+        guard let info = notification.userInfo,
+              let endFrame = (info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+              let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else { return }
+        constraint.constant = min(endFrame.minY - 10, view.frame.height / 2 + 150)
+        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut) { [weak self] in
+            self?.view.layoutIfNeeded()
+        } completion: { completed in
+            
+        }
+
     }
     
     @objc

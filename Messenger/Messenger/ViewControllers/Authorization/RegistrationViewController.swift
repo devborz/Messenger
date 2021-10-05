@@ -19,6 +19,10 @@ class RegistrationViewController: UIViewController {
     let password2TextField = UITextField()
     
     let registerButton = UIButton()
+    
+    let vStackView = UIStackView()
+    
+    var constraint: NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,18 +31,32 @@ class RegistrationViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        view.addSubview(usernameTextField)
-        view.addSubview(emailTextField)
-        view.addSubview(passwordTextField)
-        view.addSubview(password2TextField)
+        vStackView.translatesAutoresizingMaskIntoConstraints = false
+        registerButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(vStackView)
         view.addSubview(registerButton)
         
-        usernameTextField.frame = CGRect(x: 20, y: view.frame.height / 2 - 150, width: view.frame.width - 40, height: 40)
-        emailTextField.frame = CGRect(x: 20, y: usernameTextField.bottom + 20, width: view.frame.width - 40, height: 40)
-        passwordTextField.frame = CGRect(x: 20, y: emailTextField.bottom + 20, width: view.frame.width - 40, height: 40)
-        password2TextField.frame = CGRect(x: 20, y: passwordTextField.bottom + 20, width: view.frame.width - 40, height: 40)
-        registerButton.frame = CGRect(x: 20, y: password2TextField.bottom + 20, width: view.frame.width - 40, height: 50)
+        vStackView.alignment = .fill
+        vStackView.spacing = 20
+        vStackView.distribution = .fillEqually
+        vStackView.axis = .vertical
         
+        vStackView.addArrangedSubview(usernameTextField)
+        vStackView.addArrangedSubview(emailTextField)
+        vStackView.addArrangedSubview(passwordTextField)
+        vStackView.addArrangedSubview(password2TextField)
+        
+        vStackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
+        vStackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        vStackView.heightAnchor.constraint(equalToConstant: 220).isActive = true
+    
+        registerButton.topAnchor.constraint(equalTo: vStackView.bottomAnchor, constant: 20).isActive = true
+        registerButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
+        registerButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        registerButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        constraint = registerButton.bottomAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.height / 2 + 150)
+        constraint.isActive = true
         
         usernameTextField.backgroundColor = .secondarySystemBackground
         usernameTextField.placeholder = "Username"
@@ -74,11 +92,44 @@ class RegistrationViewController: UIViewController {
         registerButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         registerButton.setTitleColor(.lightGray, for: .highlighted)
         registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
-        registerButton.layer.cornerRadius = 10
+        registerButton.layer.cornerRadius = 15
         registerButton.clipsToBounds = true
+        registerButton.frame.size.height = 60
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
         view.addGestureRecognizer(gesture)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        addKeyboardObservers()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeKeyboardObservers()
+    }
+    
+    func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardChanged(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+    
+    func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc
+    func keyboardChanged(_ notification: NSNotification) {
+        guard let info = notification.userInfo,
+              let endFrame = (info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+              let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else { return }
+        constraint.constant = min(endFrame.minY - 10, view.frame.height / 2 + 150)
+        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut) { [weak self] in
+            self?.view.layoutIfNeeded()
+        } completion: { completed in
+            
+        }
+
     }
     
     @objc

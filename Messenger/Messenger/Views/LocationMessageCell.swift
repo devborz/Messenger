@@ -61,6 +61,11 @@ final class LocationMessageCell: MessageCell {
         
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(messageTapped))
         mapView.addGestureRecognizer(gestureRecognizer)
+        mapView.isUserInteractionEnabled = true
+        mapView.isZoomEnabled = false
+        mapView.isScrollEnabled = false
+        mapView.isPitchEnabled = false
+        mapView.isRotateEnabled = false
     }
     
     required init?(coder: NSCoder) {
@@ -123,7 +128,6 @@ final class LocationMessageCell: MessageCell {
         layout()
         if let location = viewModel.messageLocation {
             mapView.setRegion(MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 500, longitudinalMeters: 500), animated: false)
-            mapView.isUserInteractionEnabled = false
             let annotation = MKPointAnnotation()
             annotation.title = location.name
             annotation.coordinate = location.coordinate
