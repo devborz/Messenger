@@ -13,12 +13,12 @@
 
 #### Chats screen
 
-<img src="https://github.com/devborz/Messenger/blob/main/img/chat.png" alt="drawing" width="200"/>
+<img src="https://github.com/devborz/Messenger/blob/main/img/chats.png" alt="chats" width="250"/>
 
 #### Chat
 
-![Chat](https://github.com/devborz/Messenger/blob/main/img/chat.png)
+<img src="https://github.com/devborz/Messenger/blob/main/img/chat.png" alt="chat" width="250"/>
 
 #### Settings
 
-![Settings](https://github.com/devborz/Messenger/blob/main/img/settings.png)
+<img src="https://github.com/devborz/Messenger/blob/main/img/settings.png" alt="settings" width="200"/>
