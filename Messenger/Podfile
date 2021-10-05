@@ -14,7 +14,7 @@ target 'Messenger' do
   pod 'Reachability'
   pod 'RxSwift'
   pod 'RxCocoa'
-#  pod 'Realm'
+  pod 'Realm'
   pod 'Alamofire'
 
 end
