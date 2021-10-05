@@ -13,7 +13,7 @@
 
 #### Chats screen
 
-![Chats](https://github.com/devborz/Messenger/blob/main/img/chats.png)
+<img src="https://github.com/devborz/Messenger/blob/main/img/chat.png" alt="drawing" width="200"/>
 
 #### Chat
 
