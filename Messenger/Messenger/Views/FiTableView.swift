@@ -33,11 +33,13 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
     
     private var nextSnapshot: FiSnapshot?
     
+    private var animateNext = false
+    
     private var isUpdating: Bool = false {
         didSet {
             guard isUpdating != oldValue && !isUpdating else { return }
             guard nextSnapshot != nil else { return }
-            updateWithAnimation()
+            update(animated: animateNext)
         }
     }
     
@@ -45,14 +47,14 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
         return snapshot?.count ?? 0 == 0
     }
     
-    internal override var dataSource: UITableViewDataSource? {
-        get {
-            return super.dataSource
-        }
-        set {
-            super.dataSource = newValue
-        }
-    }
+//    internal override var dataSource: UITableViewDataSource? {
+//        get {
+//            return super.dataSource
+//        }
+//        set {
+//            super.dataSource = newValue
+//        }
+//    }
     
     var cellProvider: CellsProvider?
     
@@ -71,21 +73,14 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func reload(snapshot: FiSnapshot) {
-        self.snapshot = snapshot
-        DispatchQueue.main.async { [weak self] in
-            self?.reloadData()
-        }
-    }
-    
-    func animateDifference(snapshot: FiSnapshot) {
+    func update(snapshot: FiSnapshot, animated: Bool) {
         self.nextSnapshot = snapshot
         if !isUpdating {
-            updateWithAnimation()
+            update(animated: animated)
         }
     }
     
-    private func updateWithAnimation() {
+    private func update(animated: Bool) {
         self.isUpdating = true
         guard let snapshot = snapshot,
               let nextSnapshot = nextSnapshot else {
@@ -149,8 +144,8 @@ class FiTableView<T : Hashable>: UITableView, UITableViewDataSource {
         DispatchQueue.main.async { [weak self] in
             self?.performBatchUpdates { [weak self] in
                 guard let strongSelf = self else { return }
-                strongSelf.deleteRows(at: deletingIndexPaths, with: .fade)
-                strongSelf.insertRows(at: insertingIndexPaths, with: .top)
+                strongSelf.deleteRows(at: deletingIndexPaths, with: animated ? .top : .none)
+                strongSelf.insertRows(at: insertingIndexPaths, with: animated ? .top : .none)
                 for movingRow in movingRows {
                     strongSelf.moveRow(at: movingRow.from, to: movingRow.to)
                 }

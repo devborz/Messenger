@@ -481,11 +481,11 @@ extension ChatController: ImageShowAnimatorDelegate {
 extension ChatController: ChatNodeDelegate {
     func reloadChat() {
         let snapshot: [ChatContent] = node.chatContent
-        tableView.reload(snapshot: snapshot)
+        tableView.update(snapshot: snapshot, animated: false)
     }
     
     func updateChat() {
         let snapshot: [ChatContent] = node.chatContent
-        tableView.animateDifference(snapshot: snapshot)
+        tableView.update(snapshot: snapshot, animated: true)
     }
 }
