@@ -1,5 +1,7 @@
 # Messenger
 
+An iOS messenger prototype developed in 2021.
+
 ### Techonlogy stack
 
 - [Firebase](https://firebase.google.com)
